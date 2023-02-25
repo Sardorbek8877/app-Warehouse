@@ -27,12 +27,14 @@ public class AttachmentController {
     @Autowired
     AttachmentContentRepository attachmentContentRepository;
 
+    //UPLOAD FILE
     @SneakyThrows
     @PostMapping("/upload")
     public Result upload(MultipartHttpServletRequest request){
         return attachmentService.upload(request);
     }
 
+    //DOWNLOAD FILE
     @GetMapping("/download/{id}")
     public void getFile(@PathVariable Integer id, HttpServletResponse response) throws IOException {
         attachmentService.getFile(id, response);

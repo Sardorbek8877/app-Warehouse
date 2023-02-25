@@ -1,6 +1,7 @@
 package uz.com.appwarehause.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.support.PageableUtils;
 import org.springframework.stereotype.Service;
 import uz.com.appwarehause.entity.Attachment;
 import uz.com.appwarehause.entity.Category;
@@ -60,7 +61,59 @@ public class ProductService {
         return new Result("Product successfully added!", true);
     }
 
+    public List<Product> getProducts(){
+        List<Product> productList = productRepository.findAll();
+        return productList;
+    }
 
+    public Product getProductById(Integer id){
+        Optional<Product> optionalProduct = productRepository.findById(id);
+        if (optionalProduct.isEmpty())
+            return new Product();
+        Product product = optionalProduct.get();
+        return product;
+    }
+
+    public Result deleteProduct(Integer id){
+        Optional<Product> optionalProduct = productRepository.findById(id);
+        if (optionalProduct.isPresent()){
+            productRepository.deleteById(id);
+            return new Result("Product successfully deleted", true);
+        }
+        return new Result("Product not found", false);
+    }
+
+    public Result editProduct(Integer id, ProductDto productDto){
+        Optional<Product> optionalProduct = productRepository.findById(id);
+        if (optionalProduct.isEmpty())
+            return new Result("Product not found", false);
+
+        Product product = optionalProduct.get();
+
+        //CATEGORY CHECK
+        Optional<Category> optionalCategory = categoryRepository.findById(productDto.getCategoryId());
+        if (optionalCategory.isEmpty())
+            return new Result("Category not found", false);
+
+        //PHOTO CHECK
+        Optional<Attachment> optionalAttachment = attachmentRepository.findById(productDto.getPhotoId());
+        if (optionalAttachment.isEmpty())
+            return new Result("Photo not found", false);
+
+        //MEASUREMENT CHECK
+        Optional<Measurement> optionalMeasurement = measurementRepository.findById(productDto.getMeasurementId());
+        if (optionalMeasurement.isEmpty())
+            return new Result("Measurement not found", false);
+
+        //SAVE
+        Product editingProduct = new Product();
+        editingProduct.setName(productDto.getName());
+        editingProduct.setMeasurement(optionalMeasurement.get());
+        editingProduct.setCategory(optionalCategory.get());
+        editingProduct.setPhoto(optionalAttachment.get());
+        productRepository.save(editingProduct);
+        return new Result("Product successfully edited", true);
+    }
 
     private String generateCode(){
         List<Product> productList = productRepository.findAll();
