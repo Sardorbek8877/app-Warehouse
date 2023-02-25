@@ -1,8 +1,10 @@
 package uz.com.appwarehause.service;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -12,7 +14,9 @@ import uz.com.appwarehause.payload.Result;
 import uz.com.appwarehause.repository.AttachmentContentRepository;
 import uz.com.appwarehause.repository.AttachmentRepository;
 
+import java.io.IOException;
 import java.util.Iterator;
+import java.util.Optional;
 
 @Service
 public class AttachmentService {
@@ -37,6 +41,20 @@ public class AttachmentService {
         attachmentContent.setBytes(file.getBytes());
         attachmentContent.setAttachment(savedAttachment);
         attachmentContentRepository.save(attachmentContent);
-        return new Result("File succaessfully saved!", true, savedAttachment.getId());
+        return new Result("File successfully saved!", true, savedAttachment.getId());
+    }
+
+    public void getFile(Integer id, HttpServletResponse response) throws IOException {
+        Optional<Attachment> optionalAttachment = attachmentRepository.findById(id);
+        if (optionalAttachment.isPresent()){
+            Attachment attachment = optionalAttachment.get();
+
+            Optional<AttachmentContent> optionalAttachmentContent = attachmentContentRepository.findById(id);
+            AttachmentContent attachmentContent = optionalAttachmentContent.get();
+            response.setHeader("Content-Disposition",
+                    "attachment; filename=\"" + attachment.getName() + "\"");
+            response.setContentType(attachment.getContentType());
+            FileCopyUtils.copy(attachmentContent.getBytes(), response.getOutputStream());
+        }
     }
 }
