@@ -5,4 +5,5 @@ import uz.com.appwarehause.entity.Warehouse;
 
 public interface WarehouseRepository extends JpaRepository<Warehouse, Integer> {
 
+    boolean existsByName(String name);
 }
