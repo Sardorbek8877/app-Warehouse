@@ -1,7 +1,6 @@
 package uz.com.appwarehause.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.support.PageableUtils;
 import org.springframework.stereotype.Service;
 import uz.com.appwarehause.entity.Attachment;
 import uz.com.appwarehause.entity.Category;
