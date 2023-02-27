@@ -107,16 +107,6 @@ public class InputService {
         return new Result("Input edited", true);
     }
 
-
-
-
-
-
-
-
-
-
-
     private String generateCode(){
         List<Input> inputList = inputRepository.findAll();
         return String.valueOf(inputList.size());
